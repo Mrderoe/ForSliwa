@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dice Roller</title>
+    <style>
+        *{
+            background-color: #999;
+            font-size: 20px;
+        }
+        h1{
+            font-size: 30px;
+        }
+        #history {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .info h1 {
+            margin: 5px 0;
+        }
+
+        #Luck-cubes div span {
+            margin-right: 5px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            display: inline-block;
+            color: #fff;
+            background-color: #999;
+        }
+
+        #Luck-cubes div span.selected {
+            background-color: #4caf50;
+        }
+
+        #result-countinh span.max {
+            color: #ff9800;
+            font-weight: bold;
+            margin-right: 6px;
+        }
+
+        #result-countinh span {
+            margin-right: 6px;
+        }
+        footer{
+        height: 110px;
+        width: 100%;
+        display: block;
+        position: fixed;
+        justify-content: space-around;
+        align-items: center;
+        bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <button data-dice="4">4</button>
+        <button data-dice="6">6</button>
+        <button data-dice="8">8</button>
+        <button data-dice="10">10</button>
+        <button data-dice="12">12</button>
+        <button id="luckyBtn">20</button>
+
+        <input type="number" id="level" placeholder="Уровень" />
+        <input type="number" id="luckinput" placeholder="Удача" />
+
+        <div class="info">
+            <h1 id="CubesAmount">Кол-во кубов</h1>
+            <h1 id="all-cubes">Выпало</h1>
+            <h1 id="result-countinh">Результат</h1>
+            <h1 id="Luck-cubes"></h1>
+        </div>
+
+        <div id="history">
+            <h2>История бросков:</h2>
+            <div id="history-log"></div>
+        </div>
+    </main>
+    <footer><p>Сделанно лапками кити</p> <p>^⩊^</p>
+    
+    </footer>
+    <script>
+        // Функция случайного броска кубика
+        function rollDice(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
+
+        // Взрывной бросок кубика — возвращает массив значений взрывов (числа)
+        function rollExplodingDiceValues(sides) {
+            const results = [];
+            let roll = rollDice(sides);
+            results.push(roll);
+            while (roll === sides) {
+                roll = rollDice(sides);
+                results.push(roll);
+            }
+            return results;
+        }
+
+        // Добавление записи в историю
+        function addToHistory(text) {
+            const historyLog = document.getElementById("history-log");
+            const entry = document.createElement("div");
+            entry.textContent = text;
+            historyLog.prepend(entry);
+        }
+
+        // Определение бонусных кубов по уровню
+        function getBonusDice(level) {
+            switch (parseInt(level)) {
+                case 1:
+                    return [{ count: 1, sides: 4 }];
+                case 2:
+                    return [{ count: 1, sides: 6 }];
+                case 3:
+                    return [{ count: 1, sides: 8 }];
+                case 4:
+                    return [{ count: 1, sides: 10 }];
+                case 5:
+                    return [{ count: 2, sides: 6 }];
+                case 6:
+                    return [{ count: 2, sides: 8 }];
+                case 7:
+                    return [{ count: 2, sides: 10 }];
+                case 8:
+                    return [{ count: 3, sides: 8 }];
+                case 9:
+                    return [{ count: 3, sides: 10 }];
+                case 10:
+                    return [{ count: 4, sides: 8 }];
+                case 11:
+                    return [{ count: 4, sides: 10 }];
+                case 12:
+                    return [{ count: 5, sides: 8 }];
+                case 13:
+                    return [{ count: 5, sides: 10 }];
+                case 14:
+                    return [{ count: 6, sides: 8 }];
+                case 15:
+                    return [{ count: 6, sides: 10 }];
+                case 16:
+                    return [{ count: 7, sides: 8 }];
+                case 17:
+                    return [{ count: 7, sides: 10 }];
+                case 18:
+                    return [{ count: 8, sides: 8 }];
+                case 19:
+                    return [{ count: 8, sides: 10 }];
+                case 20:
+                    return [{ count: 9, sides: 8 }];
+                case 21:
+                    return [{ count: 9, sides: 10 }];
+                case 22:
+                    return [{ count: 10, sides: 8 }];
+                case 23:
+                    return [{ count: 10, sides: 10 }];
+                case 24:
+                    return [{ count: 11, sides: 8 }];
+                case 25:
+                    return [{ count: 11, sides: 10 }];
+                case 26:
+                    return [{ count: 12, sides: 8 }];
+                case 27:
+                    return [{ count: 12, sides: 10 }];
+                case 28:
+                    return [{ count: 13, sides: 8 }];
+                case 29:
+                    return [{ count: 13, sides: 10 }];
+                case 30:
+                    return [{ count: 14, sides: 8 }];
+                case 31:
+                    return [{ count: 14, sides: 10 }];
+                case 32:
+                    return [{ count: 15, sides: 8 }];
+                case 33:
+                    return [{ count: 15, sides: 10 }];
+                case 34:
+                    return [{ count: 16, sides: 8 }];
+                case 35:
+                    return [{ count: 16, sides: 10 }];
+                default:
+                    return [];
+            }
+        }
+
+        // Обработка обычных кнопок d4-d12
+        document.querySelectorAll('button[data-dice]').forEach(button => {
+            button.addEventListener('click', () => {
+                const sides = parseInt(button.getAttribute('data-dice'));
+                const result = rollDice(sides);
+                addToHistory(`Бросок d${sides}: ${result}`);
+            });
+        });
+
+        // Вспомогательная функция для отображения взрывных бросков в виде строки с вложенными скобками
+        function formatExplodingRolls(rolls) {
+            // Пример: [10,10,7,3] -> (10 + 10 + 7 + 3)
+            return '(' + rolls.join(' + ') + ')';
+        }
+
+        // Подсветка максимальных значений в массиве значений, возвращает HTML элементы span
+        function formatValuesWithMaxHighlight(values, sides) {
+            // выделяем значения == sides
+            return values.map(val => {
+                const span = document.createElement('span');
+                span.textContent = val;
+                if (val === sides) {
+                    span.classList.add('max');
+                }
+                return span;
+            });
+        }
+
+        // Обработка кнопки d20 с удачей и взрывными кубами
+        document.getElementById("luckyBtn").addEventListener("click", () => {
+            const level = parseInt(document.getElementById("level").value) || 0;
+            const luck = parseInt(document.getElementById("luckinput").value) || 0;
+
+            const bonusDiceDef = getBonusDice(level);
+
+            const luckContainer = document.getElementById("Luck-cubes");
+            luckContainer.innerHTML = "";
+
+            // Взрывной d20 броски
+            const d20Rolls = rollExplodingDiceValues(20);
+
+            // Бросаем бонусные кубы с учетом удачи
+            let bonusRolls = [];
+
+            bonusDiceDef.forEach(group => {
+                const totalRolls = group.count + Math.abs(luck);
+                let allRolls = [];
+
+                // бросаем каждый куб с взрывами
+                for (let i = 0; i < totalRolls; i++) {
+                    const explodedRolls = rollExplodingDiceValues(group.sides);
+                    allRolls.push(explodedRolls);
+                }
+
+                // "Плоский" массив для сортировки по первому броску каждого куба, 
+                // чтоб выбрать лучшие/худшие
+                // Для удобства возьмём сумму каждого полного взрывного куба
+                const summedRolls = allRolls.map(arr => arr.reduce((a, b) => a + b, 0));
+
+                let selectedIndices;
+                if (luck > 0) {
+                    // выбираем индексы максимальных сумм
+                    selectedIndices = summedRolls
+                        .map((sum, i) => ({ sum, i }))
+                        .sort((a, b) => b.sum - a.sum)
+                        .slice(0, group.count)
+                        .map(o => o.i);
+                } else if (luck < 0) {
+                    selectedIndices = summedRolls
+                        .map((sum, i) => ({ sum, i }))
+                        .sort((a, b) => a.sum - b.sum)
+                        .slice(0, group.count)
+                        .map(o => o.i);
+                } else {
+                    selectedIndices = [...Array(group.count).keys()];
+                }
+
+                // Сохраняем выбранные взрывные броски для вывода
+                const selectedRolls = selectedIndices.map(i => allRolls[i]);
+                bonusRolls.push({ allRolls, selectedRolls, sides: group.sides });
+
+                // Отображение бонусных бросков и подсветка выбранных зеленым
+                const display = document.createElement("div");
+                display.textContent = `d${group.sides}: `;
+
+                allRolls.forEach((rollArr, idx) => {
+                    rollArr.forEach(val => {
+                        const span = document.createElement("span");
+                        span.textContent = val;
+                        if (selectedIndices.includes(idx)) {
+                            span.classList.add("selected");
+                        }
+                        display.appendChild(span);
+                    });
+                });
+
+                luckContainer.appendChild(display);
+            });
+
+            // Формируем итоговый результат и строку с разбором
+
+            // d20 — просто сумма всех бросков (взрывные броски по цепочке)
+            const d20Sum = d20Rolls.reduce((a, b) => a + b, 0);
+
+            // Форматируем d20 вывод (вся цепочка взрывов, например: 20 + 10 + 3)
+            // Для простоты вывода d20 цепочка просто через " + "
+            const d20Str = d20Rolls.join(' + ');
+
+            // Для бонусных кубов — показываем сумму каждого куба и раскрываем скобки для взрывных бросков
+            let bonusStrs = [];
+            let bonusSum = 0;
+
+            bonusRolls.forEach(({ selectedRolls, sides }) => {
+                selectedRolls.forEach(rollArr => {
+                    const sum = rollArr.reduce((a, b) => a + b, 0);
+                    bonusSum += sum;
+                    bonusStrs.push(formatExplodingRolls(rollArr));
+                });
+            });
+
+            // Итоговая строка результата
+            const finalParts = [d20Str];
+            if (bonusStrs.length) {
+                finalParts.push(...bonusStrs);
+            }
+
+            const totalSum = d20Sum + bonusSum;
+
+            // Обновляем интерфейс
+
+            // Кол-во кубов — считаем общее число бросков (все взрывные броски)
+            // считаем кол-во бросков как количество значений в d20Rolls + суммы длин всех взрывных массивов выбранных бонусных кубов
+            let totalDiceCount = d20Rolls.length;
+            bonusRolls.forEach(({ selectedRolls }) => {
+                selectedRolls.forEach(arr => {
+                    totalDiceCount += arr.length;
+                });
+            });
+
+            document.getElementById("CubesAmount").textContent = `Кол-во кубов: ${totalDiceCount}`;
+            document.getElementById("all-cubes").textContent = `Выпало: ${totalSum}`;
+
+            // Выводим результат с подсветкой максимальных (максимумы — равны стороне куба)
+            const resultContainer = document.getElementById("result-countinh");
+            resultContainer.innerHTML = "Результат: ";
+
+            // d20 броски (все)
+            d20Rolls.forEach((val, i) => {
+                const span = document.createElement("span");
+                span.textContent = val;
+                if (val === 20) span.classList.add("max");
+                resultContainer.appendChild(span);
+                if (i < d20Rolls.length - 1) {
+                    const plus = document.createElement("span");
+                    plus.textContent = " + ";
+                    resultContainer.appendChild(plus);
+                }
+            });
+
+            // Бонусные кубы (выводим как (x + y + ...), где максимумы подсвечены)
+            bonusRolls.forEach(({ selectedRolls, sides }) => {
+                selectedRolls.forEach(arr => {
+                    // плюс перед скобкой если это не первый элемент
+                    if (d20Rolls.length > 0 || bonusRolls.indexOf(arr) > 0) {
+                        const plus = document.createElement("span");
+                        plus.textContent = " + ";
+                        resultContainer.appendChild(plus);
+                    }
+
+                    const open = document.createElement("span");
+                    open.textContent = "(";
+                    resultContainer.appendChild(open);
+
+                    arr.forEach((val, idx) => {
+                        const span = document.createElement("span");
+                        span.textContent = val;
+                        if (val === sides) span.classList.add("max");
+                        resultContainer.appendChild(span);
+
+                        if (idx < arr.length - 1) {
+                            const plus = document.createElement("span");
+                            plus.textContent = " + ";
+                            resultContainer.appendChild(plus);
+                        }
+                    });
+
+                    const close = document.createElement("span");
+                    close.textContent = ")";
+                    resultContainer.appendChild(close);
+                });
+            });
+
+            // Добавляем в историю с тем же форматированием, только в текстовом виде
+            let historyText = `Ур. ${level}, Удача ${luck}: ${d20Str}`;
+            bonusStrs.forEach(b => {
+                historyText += ' + ' + b;
+            });
+            historyText += ` = ${totalSum}`;
+            addToHistory(historyText);
+        });
+    </script>
+</body>
+
+</html>
