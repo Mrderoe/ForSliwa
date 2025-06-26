@@ -190,14 +190,17 @@
             }
         }
 
-        // Обработка обычных кнопок d4-d12
+        // Обработка обычных кнопок d4-d12 со взрывными бросками
         document.querySelectorAll('button[data-dice]').forEach(button => {
             button.addEventListener('click', () => {
                 const sides = parseInt(button.getAttribute('data-dice'));
-                const result = rollDice(sides);
-                addToHistory(`Бросок d${sides}: ${result}`);
+                const rolls = rollExplodingDiceValues(sides);
+                const sum = rolls.reduce((a, b) => a + b, 0);
+                const breakdown = rolls.join(' + ');
+                addToHistory(`Бросок d${sides}: ${breakdown} = ${sum}`);
             });
         });
+
 
         // Вспомогательная функция для отображения взрывных бросков в виде строки с вложенными скобками
         function formatExplodingRolls(rolls) {
