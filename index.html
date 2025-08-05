@@ -115,38 +115,38 @@
 
         // Определение бонусных кубов по уровню
         function getBonusDice(level) {
-                function getBonusDice(level) {
-                const bonuses = [];
+            level = parseInt(level);
 
-                if (level >= 1 && level <= 4) {
-                    // фиксированные начальные уровни
-                    const sides = [4, 6, 8, 10];
-                    return [{ count: 1, sides: sides[level - 1] }];
-                }
-
-                if (level === 5) return [{ count: 2, sides: 6 }];
-                if (level === 6) return [{ count: 2, sides: 8 }];
-                if (level === 7) return [{ count: 2, sides: 10 }];
-                if (level === 8) return [{ count: 3, sides: 8 }];
-                if (level === 9) return [{ count: 3, sides: 10 }];
-
-                // С 10 уровня начинается ротация
-                const count = Math.floor((level - 10) / 2) + 4; // растёт каждые 2 уровня
-                const rotationIndex = (level - 10) % 3;
-
-                // Ротация: d8 → d10 → d12 (если d8 разрешён)
-                let sides;
-                if (level <= 35) {
-                    sides = [8, 10, 12][rotationIndex];
-                } else {
-                    // после 35 убираем d8: ротация d10 → d12
-                    sides = [10, 12][(level - 36) % 2];
-                }
-
-                return [{ count, sides }];
+            // Уровни 1–4: фиксированные значения
+            if (level >= 1 && level <= 4) {
+                const sides = [4, 6, 8, 10];
+                return [{ count: 1, sides: sides[level - 1] }];
             }
 
+            // Уровни 5–9: тоже фиксированные
+            if (level === 5) return [{ count: 2, sides: 6 }];
+            if (level === 6) return [{ count: 2, sides: 8 }];
+            if (level === 7) return [{ count: 2, sides: 10 }];
+            if (level === 8) return [{ count: 3, sides: 8 }];
+            if (level === 9) return [{ count: 3, sides: 10 }];
+
+            // Уровни 10+: ротация с добавлением d12, исключением d8 после 35
+            let count = Math.floor((level - 10) / 2) + 4; // +1 куб каждые 2 уровня
+
+            let sides;
+            if (level <= 35) {
+                // Ротация d8 → d10 → d12
+                const rotation = [8, 10, 12];
+                sides = rotation[(level - 10) % 3];
+            } else {
+                // После 35 уровня: только d10 и d12
+                const rotation = [10, 12];
+                sides = rotation[(level - 36) % 2];
+            }
+
+            return [{ count, sides }];
         }
+
 
         // Обработка обычных кнопок d4-d12 со взрывными бросками
         document.querySelectorAll('button[data-dice]').forEach(button => {
