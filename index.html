@@ -48,6 +48,7 @@
             margin-right: 6px;
         }
         footer{
+        font-family: Comic Sans MS;
         height: 110px;
         width: 100%;
         display: block;
@@ -55,7 +56,6 @@
         justify-content: space-around;
         align-items: center;
         bottom: 10px;
-        font-family: Comic Sans MS;
         }
     </style>
 </head>
@@ -114,38 +114,50 @@
         }
 
         // Определение бонусных кубов по уровню
+       // Обновлённая функция бонусных кубов по уровню с ротацией
         function getBonusDice(level) {
-            level = parseInt(level);
+            if (level < 1) return [];
 
-            // Уровни 1–4: фиксированные значения
-            if (level >= 1 && level <= 4) {
-                const sides = [4, 6, 8, 10];
-                return [{ count: 1, sides: sides[level - 1] }];
+            // Специальные уровни 1–10
+            switch (level) {
+                case 1: return [{ count: 1, sides: 4 }];
+                case 2: return [{ count: 1, sides: 6 }];
+                case 3: return [{ count: 1, sides: 8 }];
+                case 4: return [{ count: 1, sides: 10 }];
+                case 5: return [{ count: 2, sides: 6 }];
+                case 6: return [{ count: 2, sides: 8 }];
+                case 7: return [{ count: 2, sides: 10 }];
+                case 8: return [{ count: 3, sides: 8 }];
+                case 9: return [{ count: 3, sides: 10 }];
+                case 10: return [{ count: 3, sides: 12 }];
             }
 
-            // Уровни 5–9: тоже фиксированные
-            if (level === 5) return [{ count: 2, sides: 6 }];
-            if (level === 6) return [{ count: 2, sides: 8 }];
-            if (level === 7) return [{ count: 2, sides: 10 }];
-            if (level === 8) return [{ count: 3, sides: 8 }];
-            if (level === 9) return [{ count: 3, sides: 10 }];
-
-            // Уровни 10+: ротация с добавлением d12, исключением d8 после 35
-            let count = Math.floor((level - 10) / 2) + 4; // +1 куб каждые 2 уровня
-
-            let sides;
+            // Уровни 11–35: ротация по [8, 10, 12]
             if (level <= 35) {
-                // Ротация d8 → d10 → d12
-                const rotation = [8, 10, 12];
-                sides = rotation[(level - 10) % 3];
-            } else {
-                // После 35 уровня: только d10 и d12
-                const rotation = [10, 12];
-                sides = rotation[(level - 36) % 2];
+                const sidesPool = [8, 10, 12];
+                const poolLength = sidesPool.length;
+                const adjustedLevel = level - 11;
+                const diceCount = Math.floor(adjustedLevel / poolLength) + 4;
+                const diceIndex = adjustedLevel % poolLength;
+                const sides = sidesPool[diceIndex];
+                return [{ count: diceCount, sides }];
             }
 
-            return [{ count, sides }];
+            // Уровни 36+:
+            const adjusted = level - 36;
+
+            // Количество кубов: 12 + Math.floor((уровень - 38) / 2)
+            const baseDice = 12 + Math.floor(Math.max(0, adjusted) / 2);
+
+            // Чередование d10/d12
+            const sides = (adjusted % 2 === 0) ? 10 : 12;
+
+            return [{ count: baseDice, sides }];
         }
+
+
+
+
 
 
         // Обработка обычных кнопок d4-d12 со взрывными бросками
